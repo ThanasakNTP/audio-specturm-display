@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Audio Spectrum Display</title>
+
+<style>
+body{
+    background:#111;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+    margin-top:20px;
+}
+
+table{
+    margin:auto;
+    border-collapse:collapse;
+}
+
+td{
+    width:25px;
+    height:30px;
+    border:10px solid #222;
+    background:#000;
+    transition:0.05s;
+}
+
+.green{
+    background:#2AFFB0;
+}
+
+.yellow{
+    background:#FFF12A;
+}
+
+.red{
+    background:#FF2A5B;
+}
+
+button{
+    padding:8px 15px;
+    font-size:16px;
+    margin-bottom:20px;
+    color: white;
+    background-color: #444;
+}
+.label{
+    width:30px;
+    height:30px;
+    text-align:center;
+    font-weight:bold;
+    background:#202020;
+    color:#ffffff;
+    border:1px solid #444;
+}
+</style>
+</head>
+<body>
+
+<h2>Audio Spectrum Display</h2>
+
+<button id="startBtn">Start Microphone</button>
+
+<table id="grid"></table>
+<p>80 . 150 . 300 . 600 .. 1k .. 2k .. 4k .. 8k</p>
+<script> 
+
+const SIZE = 8;
+const table = document.getElementById("grid");
+
+// ===== 8x8 Pixel Grid =====
+for(let r=0;r<SIZE;r++){
+    const tr=document.createElement("tr");
+
+    for(let c=0;c<SIZE;c++){
+        const td=document.createElement("td");
+        td.id=`p-${r}-${c}`;
+        tr.appendChild(td);
+    }
+
+    table.appendChild(tr);
+}
+
+function drawBands(levels){
+
+    for(let row=0; row<SIZE; row++){
+
+        for(let col=0; col<SIZE; col++){
+
+            const pixel=document.getElementById(
+                `p-${row}-${col}`
+            );
+
+            pixel.className="";
+
+            const level=levels[col];
+
+            const pixelLevel = SIZE-row;
+
+            if(pixelLevel <= level){
+
+                if(pixelLevel <= 5)
+                    pixel.classList.add("green");
+
+                else if(pixelLevel <= 7)
+                    pixel.classList.add("yellow");
+
+                else
+                    pixel.classList.add("red");
+            }
+        }
+    }
+}
+
+document.getElementById("startBtn")
+.addEventListener("click", async ()=>{
+
+    const stream =
+        await navigator.mediaDevices.getUserMedia({
+            audio:true
+        });
+
+const audioCtx =
+        new (window.AudioContext || window.webkitAudioContext)();
+
+    // 👉 FIX FOR MOBILE: Resume context if suspended by browser policy
+    if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+    }
+
+    const analyser =
+        audioCtx.createAnalyser();
+
+    analyser.fftSize = 1024;
+
+    const source =
+        audioCtx.createMediaStreamSource(stream);
+
+    source.connect(analyser);
+
+    const data =
+        new Uint8Array(
+            analyser.frequencyBinCount
+        );
+
+    function animate(){
+
+        analyser.getByteFrequencyData(data);
+
+const levels = [];
+
+const BANDS = [
+    { start: 1,   end: 2   }, // 80Hz
+    { start: 3,   end: 7   }, // 150Hz
+    { start: 8,   end: 14  }, // 300Hz
+    { start: 15,  end: 24  }, // 600Hz
+    { start: 25,  end: 47  }, // 1k
+    { start: 48,  end: 93  }, // 2k
+    { start: 110, end: 170 }, // 4k // 94-186
+    { start: 195, end: 265 }  // 8k // 187-279
+];
+
+for(const band of BANDS){
+
+    let sum = 0;
+    let count = 0;
+
+    for(let i = band.start; i <= band.end; i++){
+
+        sum += data[i];
+        count++;
+    }
+
+    let avg = sum / count;
+
+    // boost weak microphone levels
+    //avg *= 1.8;
+
+    let level = Math.round(
+        avg / 255 * 8
+    );
+
+   level = Math.max(0,Math.min(8, level)
+   );
+
+    levels.push(level);
+}
+
+        drawBands(levels);
+
+        requestAnimationFrame(
+            animate
+        );
+    }
+
+    animate();
+});
+</script>
+
+</body>
+</html>
