@@ -13,6 +13,19 @@ body{
     margin-top:20px;
 }
 
+#freq_display {
+  /*border: 2px solid #777;*/
+}
+#freq_scale{
+    display:inline-block;
+    margin-top:8px;
+    color:#CCC;
+    font-size:14px;
+    padding:0 6px;
+}
+#freq_scale span {
+  margin: 0 8px;
+}
 table{
     margin:auto;
     border-collapse:collapse;
@@ -45,14 +58,24 @@ button{
     color: white;
     background-color: #444;
 }
-.label{
-    width:30px;
-    height:30px;
-    text-align:center;
+.container{
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    width:400px;
+    margin-top: 20px;
+}
+
+#slider{
+    width:300px;
+    cursor:pointer;
+}
+
+#value{
+    margin-top:10px;
+    font-size:25px;
     font-weight:bold;
-    background:#202020;
-    color:#ffffff;
-    border:1px solid #444;
+    color:white;
 }
 </style>
 </head>
@@ -62,9 +85,33 @@ button{
 
 <button id="startBtn">Start Microphone</button>
 
-<table id="grid"></table>
-<p>80 . 150 . 300 . 600 .. 1k .. 2k .. 4k .. 8k</p>
+<div id="freq_display">
+  <table id="grid"></table>
+<div id="freq_scale">
+    <span>80</span>
+    <span>150</span>
+    <span>300</span>
+    <span>600</span>
+    <span>1k</span>
+    <span>2k</span>
+    <span>4k</span>
+    <span>8k</span>
+</div>
+</div>
+
+<div class="container">
+    <p>Input Volume</p>
+    <input type="range" id="slider" min="50" max="150" value="100">
+    <div id="value">100%</div>
+</div>
+
 <script> 
+// ===== Slider Level =====
+const slider = document.getElementById('slider');
+const value = document.getElementById('value');
+slider.addEventListener('input', () => {
+    value.textContent = `${slider.value}%`;
+});
 
 const SIZE = 8;
 const table = document.getElementById("grid");
@@ -174,8 +221,8 @@ for(const band of BANDS){
 
     let avg = sum / count;
 
-    // boost weak microphone levels
-    //avg *= 1.8;
+    // Increase/Decrease Microphone levels
+    avg *= slider.value/100;
 
     let level = Math.round(
         avg / 255 * 8
