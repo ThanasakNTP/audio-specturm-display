@@ -33,7 +33,7 @@ table{
 
 td{
     width:25px;
-    height:30px;
+    height:25px;
     border:10px solid #222;
     background:#000;
     transition:0.05s;
@@ -68,11 +68,29 @@ button{
 
 #slider{
     width:300px;
+    height: 10px;
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    background:#555;
+    border:3px solid #333;
+    border-radius:4px;
+    outline:none;
+}
+/* Chrome, Edge, Safari Thumb */
+#slider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:40px; /* larger knob */
+    height:30px;
+    background:#CCC;
+    border:3px solid #777;
+    border-radius:6px;
     cursor:pointer;
 }
 
 #value{
-    margin-top:10px;
+    margin-top:18px;
     font-size:25px;
     font-weight:bold;
     color:white;
