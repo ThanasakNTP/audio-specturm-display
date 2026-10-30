@@ -33,7 +33,7 @@ table{
 
 td{
     width:25px;
-    height:25px;
+    height:20px;
     border:10px solid #222;
     background:#000;
     transition:0.05s;
@@ -178,8 +178,9 @@ function drawBands(levels){
     }
 }
 
-document.getElementById("startBtn")
-.addEventListener("click", async ()=>{
+const startButton = document.getElementById("startBtn");
+
+startButton.addEventListener("click", async ()=>{
 
     const stream =
         await navigator.mediaDevices.getUserMedia({
@@ -194,15 +195,15 @@ const audioCtx =
         await audioCtx.resume();
     }
 
-    const analyser =
-        audioCtx.createAnalyser();
+    const analyser = audioCtx.createAnalyser();
 
     analyser.fftSize = 1024;
 
-    const source =
-        audioCtx.createMediaStreamSource(stream);
-
+    const source = audioCtx.createMediaStreamSource(stream);
     source.connect(analyser);
+
+    startButton.disabled = true;
+    startButton.textContent = "Stop Mic - Refresh";
 
     const data =
         new Uint8Array(
@@ -242,12 +243,14 @@ for(const band of BANDS){
     // Increase/Decrease Microphone levels
     avg *= slider.value/100;
 
-    let level = Math.round(
-        avg / 255 * 10
-    );
+    let level = Math.round(avg / 255 * 10); // Linear
+    level = Math.max(0,Math.min(10, level));
 
-   level = Math.max(0,Math.min(10, level)
-   );
+    //let dB = Math.round(20 * Math.log10(avg / 255)); // Decibel
+    //if (!isFinite(dB)) {
+    //  dB = -40;
+    //}
+    //let level = ((Math.max(-40, Math.min(0, dB)) + 40) / 40) * 10;
 
     levels.push(level);
 }
