@@ -106,9 +106,9 @@ button{
 <div id="freq_display">
   <table id="grid"></table>
 <div id="freq_scale">
-    <span>50</span>
-    <span>100</span>
-    <span>150</span>
+    <span>40</span>
+    <span>80</span>
+    <span>140</span>
     <span>250</span>
     <span>350</span>
     <span>500</span>
@@ -224,9 +224,9 @@ const audioCtx =
 const levels = [];
 
 const BANDS = [
-    { start: 1,  end: 1 }, // 50
-    { start: 2,  end: 2 }, // 100
-    { start: 3,  end: 4 }, // 150
+    { start: 1,  end: 1 }, // 40
+    { start: 2,  end: 2 }, // 80
+    { start: 3,  end: 4 }, // 140
     { start: 5,  end: 6 }, // 250
     { start: 7,  end: 8 }, // 350
     { start: 9,  end: 11 }, // 500
@@ -238,7 +238,7 @@ const BANDS = [
     { start: 94, end: 140 }, // 6k
     { start: 141, end: 186 }, // 8k
     { start: 187, end: 233 }, // 10k
-    { start: 234, end: 256 }, // 12k
+    { start: 234, end: 280 }, // 12k
 ];
 
 for(const band of BANDS){
