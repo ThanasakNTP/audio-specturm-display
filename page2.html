@@ -12,7 +12,6 @@ body{
     text-align:center;
     margin-top:20px;
 }
-
 #freq_display {
   /*border: 2px solid #777;*/
 }
@@ -30,7 +29,6 @@ table{
     margin:auto;
     border-collapse:collapse;
 }
-
 td{
     width:20px;
     height:20px;
@@ -38,19 +36,24 @@ td{
     background:#000;
     transition:0.05s;
 }
-
+.purple{
+    background:#B726FF;
+}
+.blue{
+    background:#2660FF;
+}
+.cyan{
+    background:#21CCFF;
+}
 .green{
     background:#2AFFB0;
 }
-
 .yellow{
     background:#FFF12A;
 }
-
 .red{
     background:#FF2A5B;
 }
-
 button{
     padding:8px 15px;
     font-size:16px;
@@ -65,7 +68,6 @@ button{
     width:400px;
     margin-top: 20px;
 }
-
 #slider{
     width:350px;
     height: 10px;
@@ -88,7 +90,28 @@ button{
     border-radius:6px;
     cursor:pointer;
 }
-
+.style-selector {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+    color: white;
+}
+.style-selector input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    border: 2px solid #888;
+    border-radius: 4px;
+    background: #222;
+    cursor: pointer;
+}
+.style-selector input[type="radio"]:checked {
+    background: #00ff88;
+    border-color: #00ff88;
+    box-shadow: 0 0 8px #00ff88;
+}
 #value{
     margin-top:18px;
     font-size:25px;
@@ -112,15 +135,15 @@ button{
     <span>250</span>
     <span>350</span>
     <span>500</span>
-    <span>750</span>
+    <span>700</span>
     <span>1k</span>
     <span>1k5</span>
     <span>2k5</span>
     <span>4k</span>
     <span>6k</span>
     <span>8k</span>
-    <span>10k</span>
-    <span>12k</span>
+    <span>11k</span>
+    <span>14k</span>
 </div>
 </div>
 
@@ -128,6 +151,17 @@ button{
     <p>Input Volume</p>
     <input type="range" id="slider" min="50" max="150" value="100">
     <div id="value">100%</div>
+</div>
+
+<div class="style-selector">
+    <label>
+        <input type="radio" name="spectrumStyle" value="meter" checked>
+        <p>Meters</p>
+    </label>
+    <label>
+        <input type="radio" name="spectrumStyle" value="rainbow">
+        <p>Rainbow</p>
+    </label>
 </div>
 
 <script> 
@@ -154,7 +188,15 @@ for(let r=0;r<10;r++){
     table.appendChild(tr);
 }
 
+let currentStyle = "meter";
+document.querySelectorAll('input[name="spectrumStyle"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+	currentStyle = radio.value;
+    });
+});
+
 function drawBands(levels){
+    let style = 1;
 
     for(let row=0; row<10; row++){
 
@@ -171,15 +213,27 @@ function drawBands(levels){
             const pixelLevel = 10-row;
 
             if(pixelLevel <= level){
-
+	    if (currentStyle === "meter") {  // Meters
                 if(pixelLevel <= 6)
                     pixel.classList.add("green");
-
                 else if(pixelLevel <= 8)
                     pixel.classList.add("yellow");
-
                 else
                     pixel.classList.add("red");
+            } else {  // Rainbow
+                if (col <= 1)
+                  pixel.classList.add("red");
+                else if (col <= 3)
+                  pixel.classList.add("yellow");
+                else if (col <= 6)
+                  pixel.classList.add("green");
+                else if (col <= 9)
+                  pixel.classList.add("cyan");
+                else if (col <= 12)
+                  pixel.classList.add("blue");
+                else
+                  pixel.classList.add("purple");
+            }
             }
         }
     }
@@ -194,10 +248,8 @@ startButton.addEventListener("click", async ()=>{
             audio:true
         });
 
-const audioCtx =
-        new (window.AudioContext || window.webkitAudioContext)();
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // 👉 FIX FOR MOBILE: Resume context if suspended by browser policy
     if (audioCtx.state === 'suspended') {
         await audioCtx.resume();
     }
@@ -230,15 +282,15 @@ const BANDS = [
     { start: 5,  end: 6 }, // 250
     { start: 7,  end: 8 }, // 350
     { start: 9,  end: 11 }, // 500
-    { start: 12, end: 18 }, // 750
+    { start: 12, end: 18 }, // 700
     { start: 19, end: 24 }, // 1k
     { start: 25, end: 35 }, // 1.5k
     { start: 36, end: 58 }, // 2.5k
     { start: 59, end: 93 }, // 4k
     { start: 94, end: 140 }, // 6k
     { start: 141, end: 186 }, // 8k
-    { start: 187, end: 233 }, // 10k
-    { start: 234, end: 280 }, // 12k
+    { start: 187, end: 255 }, // 11k
+    { start: 256, end: 326 } // 14k
 ];
 
 for(const band of BANDS){
@@ -260,15 +312,8 @@ for(const band of BANDS){
     let level = Math.round(avg / 255 * 10); // Linear
     level = Math.max(0,Math.min(10, level));
 
-    //let dB = Math.round(20 * Math.log10(avg / 255)); // Decibel
-    //if (!isFinite(dB)) {
-    //  dB = -40;
-    //}
-    //let level = ((Math.max(-40, Math.min(0, dB)) + 40) / 40) * 10;
-
     levels.push(level);
 }
-
         drawBands(levels);
 
         requestAnimationFrame(
