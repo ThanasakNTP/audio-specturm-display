@@ -39,14 +39,15 @@ td{
     transition:0.05s;
 }
 
+.light_cyan {
+    background:#19F3FF;
+}
 .green{
     background:#2AFFB0;
 }
-
 .yellow{
     background:#FFF12A;
 }
-
 .red{
     background:#FF2A5B;
 }
@@ -88,7 +89,31 @@ button{
     border-radius:6px;
     cursor:pointer;
 }
-
+.style-selector {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 30px 0;
+    color: white;
+}
+.style-selector label {
+    width: 80px;
+}
+.style-selector input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 25px;
+    height: 25px;
+    border: 2px solid #888;
+    border-radius: 4px;
+    background: #222;
+    cursor: pointer;
+}
+.style-selector input[type="radio"]:checked {
+    background: #00ff88;
+    border-color: #00ff88;
+    box-shadow: 0 0 8px #00ff88; // Modern Green: #00ff88
+}
 #value{
     margin-top:18px;
     font-size:25px;
@@ -126,8 +151,18 @@ button{
     <div id="value">100%</div>
 </div>
 
-<br></br>
-<p>New Version Avaliable</p><a href="https://thanasakntp.github.io/audio-specturm-display/page2.html" id="new_version">Click Here</a>
+<div class="style-selector">
+    <label>
+        <input type="radio" name="spectrumStyle" value="1_color" checked>
+        <p>1 Color</p>
+    </label>
+    <label>
+        <input type="radio" name="spectrumStyle" value="meter" checked>
+        <p>Meters</p>
+    </label>
+</div>
+
+<p>New Version Avaliable</p><a href="https://thanasakntp.github.io/audio-specturm-display-v2/" id="new_version">Click Here</a>
 
 <script> 
 // ===== Slider Level =====
@@ -153,6 +188,14 @@ for(let r=0;r<10;r++){
     table.appendChild(tr);
 }
 
+let currentStyle = "meter";
+document.querySelectorAll('input[name="spectrumStyle"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+	currentStyle = radio.value;
+    });
+});
+
+
 function drawBands(levels){
 
     for(let row=0; row<10; row++){
@@ -170,15 +213,19 @@ function drawBands(levels){
             const pixelLevel = 10-row;
 
             if(pixelLevel <= level){
-
+            if (currentStyle === "meter") { // Meters
                 if(pixelLevel <= 6)
                     pixel.classList.add("green");
-
                 else if(pixelLevel <= 8)
                     pixel.classList.add("yellow");
-
                 else
                     pixel.classList.add("red");
+            } else  {  // Single Color
+                if(pixelLevel <= 8)
+                    pixel.classList.add("light_cyan");
+                else
+                    pixel.classList.add("yellow");
+            }
             }
         }
     }
