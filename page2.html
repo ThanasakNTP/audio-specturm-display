@@ -42,6 +42,9 @@ td{
 .blue{
     background:#2660FF;
 }
+.light_cyan {
+    background:#19F3FF;
+}
 .cyan{
     background:#21CCFF;
 }
@@ -53,6 +56,9 @@ td{
 }
 .red{
     background:#FF2A5B;
+}
+.white{
+    background:#E9E9E9;
 }
 button{
     padding:8px 15px;
@@ -93,9 +99,12 @@ button{
 .style-selector {
     display: flex;
     justify-content: center;
-    gap: 40px;
+    gap: 20px;
     margin: 30px 0;
     color: white;
+}
+.style-selector label {
+    width: 80px;
 }
 .style-selector input[type="radio"] {
     appearance: none;
@@ -110,7 +119,7 @@ button{
 .style-selector input[type="radio"]:checked {
     background: #00ff88;
     border-color: #00ff88;
-    box-shadow: 0 0 8px #00ff88;
+    box-shadow: 0 0 8px #00ff88; // Modern Green: #00ff88
 }
 #value{
     margin-top:18px;
@@ -155,12 +164,20 @@ button{
 
 <div class="style-selector">
     <label>
+        <input type="radio" name="spectrumStyle" value="1_color" checked>
+        <p>1 Color</p>
+    </label>
+    <label>
         <input type="radio" name="spectrumStyle" value="meter" checked>
         <p>Meters</p>
     </label>
     <label>
         <input type="radio" name="spectrumStyle" value="rainbow">
         <p>Rainbow</p>
+    </label>
+    <label>
+        <input type="radio" name="spectrumStyle" value="red_white">
+        <p>Red-White</p>
     </label>
 </div>
 
@@ -220,7 +237,12 @@ function drawBands(levels){
                     pixel.classList.add("yellow");
                 else
                     pixel.classList.add("red");
-            } else {  // Rainbow
+            } else if (currentStyle === "1_color") {  // Single Color
+                if(pixelLevel <= 8)
+                    pixel.classList.add("light_cyan");
+                else
+                    pixel.classList.add("yellow");
+            } else if (currentStyle === "rainbow") {  // Rainbow
                 if (col <= 1)
                   pixel.classList.add("red");
                 else if (col <= 3)
@@ -233,6 +255,11 @@ function drawBands(levels){
                   pixel.classList.add("blue");
                 else
                   pixel.classList.add("purple");
+            } else {
+                if (col % 2 === 0)
+                   pixel.classList.add("red");
+                else 
+                   pixel.classList.add("white");
             }
             }
         }
@@ -289,8 +316,8 @@ const BANDS = [
     { start: 59, end: 93 }, // 4k
     { start: 94, end: 140 }, // 6k
     { start: 141, end: 186 }, // 8k
-    { start: 187, end: 255 }, // 11k
-    { start: 256, end: 326 } // 14k
+    { start: 200, end: 255 }, // 11k // 187
+    { start: 270, end: 326 } // 14k // 256
 ];
 
 for(const band of BANDS){
